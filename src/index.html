@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <title>App</title>
+
+    <style>
+      .skip-link {
+        position: absolute;
+        left: -999px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        z-index: 100;
+        background: #000;
+        color: #fff;
+        padding: 8px;
+        text-decoration: none;
+      }
+      .skip-link:focus,
+      .skip-link:active {
+        left: 10px;
+        top: 10px;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a href="#main-content" class="skip-link">Skip to content</a>
+      <div class="main-header container">
+        <h1 class="visually-hidden">Share Story App</h1>
+        <a class="brand-name" href="#/" aria-label="Go to homepage">App</a>
+
+        <button
+          id="dark-mode-toggle"
+          aria-label="Toggle dark mode"
+          aria-pressed="false"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          🌙
+        </button>
+
+        <nav id="navigation-drawer" class="navigation-drawer" aria-label="Primary navigation">
+          <ul id="nav-list" class="nav-list">
+            <li><a href="#/">Beranda</a></li>
+            <li><a href="#/add-story" data-auth="logged-in"><i data-feather="plus-circle"></i> Tambah data</a></li>
+            <li><a href="#/about">About</a></li>
+            <li><a href="#/login" data-auth="logged-out"><i data-feather="log-in"></i> Login</a></li>
+            <li><a href="#/register" data-auth="logged-out">Register</a></li>
+            <li><a href="#" id="logout-link" data-auth="logged-in">Logout</a></li>
+          </ul>
+        </nav>
+
+        <button
+          id="drawer-button"
+          class="drawer-button"
+          aria-label="Toggle navigation menu"
+          aria-expanded="false"
+          aria-controls="navigation-drawer"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main id="main-content" class="main-content" tabindex="-1" role="main" aria-label="Main content">
+      <!-- Konten dinamis SPA akan dimuat di sini -->
+    </main>
+
+    <footer class="footer container" role="contentinfo" aria-label="Footer information">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="footer-logo">🌱</span>
+          <span class="footer-title">App</span>
+        </div>
+        <div class="footer-links">
+          <a href="#/about">About</a>
+          <a href="#/privacy">Privacy Policy</a>
+          <a href="#/contact">Contact</a>
+        </div>
+        <div class="footer-copy">
+          &copy; 2025 App. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        feather.replace();
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const toggle = document.getElementById('dark-mode-toggle');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const savedTheme = localStorage.getItem('theme');
+
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+          document.body.classList.add('dark');
+          toggle.setAttribute('aria-pressed', 'true');
+        }
+
+        toggle.addEventListener('click', () => {
+          const isDark = document.body.classList.toggle('dark');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+          toggle.setAttribute('aria-pressed', isDark.toString());
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const logoutLink = document.getElementById('logout-link');
+
+        function updateAuthLinks() {
+          const tokenExists = !!localStorage.getItem('accessToken');
+          logoutLink.style.display = tokenExists ? 'inline' : 'none';
+
+          document.querySelectorAll('[data-auth]').forEach((el) => {
+            const required = el.getAttribute('data-auth');
+            if (required === 'logged-in') {
+              el.style.display = tokenExists ? 'inline' : 'none';
+            } else if (required === 'logged-out') {
+              el.style.display = tokenExists ? 'none' : 'inline';
+            }
+          });
+        }
+
+        updateAuthLinks();
+
+        logoutLink.addEventListener('click', (event) => {
+          event.preventDefault();
+          localStorage.removeItem('accessToken');
+          alert('Anda telah logout.');
+          updateAuthLinks();
+          window.location.hash = '/login';
+        });
+      });
+    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const mainContent = document.querySelector('#main-content');
+        const skipLink = document.querySelector('.skip-link');
+        skipLink.addEventListener('click', function (event) {
+          event.preventDefault();
+          skipLink.blur();
+          mainContent.focus();
+          mainContent.scrollIntoView();
+        });
+      });
+    </script>
+  </body>
+</html>
+
+
